@@ -1,0 +1,16 @@
+name*,version*,license*,vendor/community,end-of-support,dependencies,language
+commons-lang3,3.1,Apache 2.0,,,,java
+
+csi-stadapter,1.4.6,???,,,,java
+iridev2-pep-intf,2.0.0,???,,,,java
+
+jboss-jsp-api_2.2_spec,1.0.1.Final-redhat-1,LGPL 2.1,,,,java
+jboss-servlet-api_3.0_spec,1.0.1.Final-redhat-1,CDDL+GPL 2.0,,,,java
+log4j,1.2.15,Apache 2.0,,,,java
+spring-beans,3.1.1.RELEASE,Apache 2.0,,,,java
+spring-context,3.1.1.RELEASE,Apache 2.0,,,,java
+spring-core,3.1.1.RELEASE,Apache 2.0,,,,java
+spring-web,3.1.1.RELEASE,Apache 2.0,,,,java
+struts2-arianna-plugin,0.5.1,Apache 2.0,,,,java
+struts2-core,2.3.32,Apache 2.0,,,,java
+xwork-core,2.3.32,Apache 2.0,,,,java
