@@ -5,9 +5,9 @@
 package it.csi.siac.siaccommonapp.interceptor;
 
 import com.opensymphony.xwork2.ActionInvocation;
-import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
 
-import it.csi.siac.siaccommon.util.log.LogUtil;
+import it.csi.siac.siaccommonapp.interceptor.base.BaseLogInterceptor;
+import it.csi.siac.siaccommonapp.util.log.LogWebUtil;
 
 /**
  * Interceptor di log. 
@@ -18,21 +18,20 @@ import it.csi.siac.siaccommon.util.log.LogUtil;
  * @author Alessandro Marchino
  *
  */
-public class LogInterceptor extends AbstractInterceptor {
+public class LogInterceptor extends BaseLogInterceptor {
 
-	/** Per la serializzazione */
 	private static final long serialVersionUID = 1518258887614549162L;
 	
 	@Override
 	public String intercept(ActionInvocation invocation) throws Exception {
 		final String methodName = invocation.getProxy().getMethod();
 		
-		// Inserito all'interno del metodo in quanto non utilizzato altrove
-		LogUtil log = new LogUtil(invocation.getAction().getClass());
+		LogWebUtil log = new LogWebUtil(invocation.getAction().getClass());
 		log.debugStart(methodName, "");
-		
+
+		super.initRequestId(invocation);
+
 		String risultatoInvocazione = null;
-		
 		try{
 			risultatoInvocazione = invocation.invoke();
 		} catch(Exception e) {

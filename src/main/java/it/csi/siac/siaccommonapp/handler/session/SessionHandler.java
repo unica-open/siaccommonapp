@@ -9,16 +9,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import it.csi.siac.siaccommon.util.JAXBUtility;
+import it.csi.siac.siaccommon.util.number.NumberUtil;
 import it.csi.siac.siaccorser.model.Account;
 import it.csi.siac.siaccorser.model.Azione;
 import it.csi.siac.siaccorser.model.AzioneConsentita;
 import it.csi.siac.siaccorser.model.AzioneRichiesta;
 import it.csi.siac.siaccorser.model.Bilancio;
 import it.csi.siac.siaccorser.model.Ente;
+import it.csi.siac.siaccorser.model.FaseBilancio;
 import it.csi.siac.siaccorser.model.Operatore;
 import it.csi.siac.siaccorser.model.Richiedente;
 
@@ -63,6 +67,14 @@ public class SessionHandler implements Serializable {
 				session.put(sessionParam.getName(), null);
 	}
 
+	/**
+	 * metodo di utilita per controllare se l'oggetto e' presente
+	 * @param chiave
+	 * @return boolean
+	 */
+	public boolean containsKey(Object chiave) {
+		return this.session.containsKey(chiave);
+	}
 
 	/**
 	 * Imposta a <code>null</code> i parametri in sessione dichiarati come
@@ -145,6 +157,12 @@ public class SessionHandler implements Serializable {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T getParametro(HttpSession httpSession, SessionParameter param) {
+		return (T) (httpSession == null ? null : 
+					httpSession.getAttribute(param.getName()));
+
+	}
 	/**
 	 * Reperisce un parametro dalla sessione
 	 * 
@@ -185,12 +203,15 @@ public class SessionHandler implements Serializable {
 	public Bilancio getBilancio() {
 		Bilancio bilancio = new Bilancio();
 
-		int uid = Integer.parseInt(getIdBilancio());
-		int anno = Integer.parseInt(getAnnoEsercizio());
+		bilancio.setUid(Integer.parseInt(getIdBilancio()));
+		bilancio.setAnno(getAnnoBilancio());
+		bilancio.setFaseAttuale(getFaseBilancioEnum());
 
-		bilancio.setUid(uid);
-		bilancio.setAnno(anno);
 		return bilancio;
+	}
+
+	public Integer getAnnoBilancio() {
+		return NumberUtil.safeParseInt(getAnnoEsercizio());
 	}
 
 	/**
@@ -252,9 +273,13 @@ public class SessionHandler implements Serializable {
 
 	/**
 	 * getter specifico per parametro di sessione annoEsercizio
-	 * 
+	 * @deprecated
+     * This method returns a string.
+     * <p> Use {@link getAnnoBilancio()} instead.
+     *
 	 * @return l'anno di esercizio presente in sessione
 	 */
+	@Deprecated
 	public String getAnnoEsercizio() {
 		return getParametro(CommonSessionParameter.ANNO_ESERCIZIO);
 	}
@@ -302,6 +327,10 @@ public class SessionHandler implements Serializable {
 	 */
 	public String getFaseBilancio() {
 		return getParametro(CommonSessionParameter.CODICE_FASE_ANNO_BILANCIO);
+	}
+
+	public FaseBilancio getFaseBilancioEnum() {
+		return FaseBilancio.fromCodice(getFaseBilancio());
 	}
 
 	/**

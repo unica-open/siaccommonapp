@@ -9,11 +9,8 @@ import java.util.Map;
 
 import it.csi.siac.siaccorser.model.Operatore;
 
+public interface LoginHandler extends Serializable{
 
-public abstract class LoginHandler implements Serializable{
+	public Operatore getOperatore(Map<String, Object> session);
 
-	private static final long serialVersionUID = -551275319017545387L;
-
-	public abstract Operatore getOperatore(Map<String, Object> session);
-	
 }

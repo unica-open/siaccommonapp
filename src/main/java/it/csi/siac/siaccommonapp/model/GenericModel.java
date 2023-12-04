@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.csi.siac.siaccommon.util.log.LogUtil;
+import it.csi.siac.siaccommonapp.util.log.LogWebUtil;
 import it.csi.siac.siaccorser.model.Account;
 import it.csi.siac.siaccorser.model.AzioneRichiesta;
 import it.csi.siac.siaccorser.model.Errore;
@@ -27,7 +28,7 @@ public class GenericModel implements Serializable{
 
 	private static final long serialVersionUID = 426873589273120770L;
 	
-	protected transient LogUtil log = new LogUtil(this.getClass());
+	protected transient LogWebUtil log = new LogWebUtil(this.getClass());
 
 	private String titolo;
 	private List<Errore> errori = new ArrayList<Errore>();
@@ -84,6 +85,13 @@ public class GenericModel implements Serializable{
 	 */
 	public List<Errore> getErrori() {
 		return errori;
+	}
+
+	/**
+	 * @return <boolean> true if has error or false if not
+	 */
+	public boolean hasErrori() {
+		return getErrori().size() > 0 ? true : false;
 	}
 
 	/**
@@ -264,7 +272,7 @@ public class GenericModel implements Serializable{
 	 */
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
-		this.log = new LogUtil(this.getClass());
+		this.log = new LogWebUtil(this.getClass());
 		this.messaggi = new ArrayList<Messaggio>();
 	}
 	

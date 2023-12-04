@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-FileCopyrightText: Copyright 2020 | CSI Piemonte
+SPDX-License-Identifier: EUPL-1.2
+-->
 <taglib version="2.1" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd">
 	<description><![CDATA["Struts2 Anchor Tags: to use the anchors defined in the Struts2 project"]]></description>
@@ -10,7 +14,7 @@
 		<description>
 			<![CDATA[
 			Anchor's Iterator Tag.
-			The tag iterates over the stored trail pushing the crumb into to OGNL value stack.     
+			The tag iterates over the stored trail pushing the crumb into to OGNL value stack.
 			]]>
 		</description>
 		

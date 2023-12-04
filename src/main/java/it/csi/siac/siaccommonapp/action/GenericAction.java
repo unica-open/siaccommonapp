@@ -4,7 +4,6 @@
 */
 package it.csi.siac.siaccommonapp.action;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -13,28 +12,47 @@ import javax.annotation.Resource;
 
 import org.apache.struts2.interceptor.RequestAware;
 import org.apache.struts2.interceptor.SessionAware;
+
+import xyz.timedrain.arianna.plugin.BreadCrumbTrail;
+import xyz.timedrain.arianna.plugin.Crumb;
+/*
 import org.softwareforge.struts2.breadcrumb.BreadCrumbTrail;
 import org.softwareforge.struts2.breadcrumb.Crumb;
+*/
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.GenericTypeResolver;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.ModelDriven;
 import com.opensymphony.xwork2.Preparable;
 
-import it.csi.siac.siaccommon.util.log.LogUtil;
+import it.csi.siac.siaccommon.util.MimeType;
 import it.csi.siac.siaccommonapp.handler.session.CommonSessionParameter;
 import it.csi.siac.siaccommonapp.handler.session.SessionHandler;
 import it.csi.siac.siaccommonapp.model.GenericModel;
 import it.csi.siac.siaccommonapp.util.exception.UtenteNonLoggatoException;
+import it.csi.siac.siaccommonapp.util.exception.WebServiceInvocationFailureException;
+import it.csi.siac.siaccommonapp.util.log.LogWebUtil;
 import it.csi.siac.siaccommonapp.util.login.LoginHandler;
+import it.csi.siac.siaccorser.frontend.webservice.CoreService;
+import it.csi.siac.siaccorser.frontend.webservice.exception.SystemException;
+import it.csi.siac.siaccorser.frontend.webservice.msg.GetParametroConfigurazioneEnte;
+import it.csi.siac.siaccorser.frontend.webservice.msg.GetParametroConfigurazioneEnteResponse;
+import it.csi.siac.siaccorser.model.Bilancio;
 import it.csi.siac.siaccorser.model.Errore;
 import it.csi.siac.siaccorser.model.Informazione;
 import it.csi.siac.siaccorser.model.Messaggio;
 import it.csi.siac.siaccorser.model.Operatore;
+import it.csi.siac.siaccorser.model.ParametroConfigurazioneEnteEnum;
+import it.csi.siac.siaccorser.model.Richiedente;
 import it.csi.siac.siaccorser.model.ServiceRequest;
 import it.csi.siac.siaccorser.model.ServiceResponse;
 import it.csi.siac.siaccorser.model.errore.ErroreCore;
 import it.csi.siac.siaccorser.model.exception.UtenteNonAutenticatoException;
+import it.csi.siac.siaccorser.model.file.File;
+import it.csi.siac.siaccorser.model.file.TipoFileHandler;
+import it.csi.siac.siaccorser.model.file.TipoFileIntf;
+import it.csi.siac.siaccorser.util.AzioneConsentitaEnum;
 
 /**
  * Action base per tutte le action. Prepara il Model, la sessione, e l'Operatore
@@ -50,7 +68,7 @@ public abstract class GenericAction<M extends GenericModel> extends ActionSuppor
 	private static final long serialVersionUID = -3474331964452951L;
 
 	/** Utility per il log */
-	protected transient LogUtil log = new LogUtil(this.getClass());
+	protected transient LogWebUtil log = new LogWebUtil(this.getClass());
 
 	/** Modello per Struts */
 	protected M model;
@@ -63,6 +81,9 @@ public abstract class GenericAction<M extends GenericModel> extends ActionSuppor
 	@Resource(name = "loginHandlerBean")
 	protected LoginHandler loginHandler;
 
+	
+	@Autowired protected transient CoreService coreService;
+	
 	@Override
 	public void prepare() throws Exception {
 		final String methodName = "prepare";
@@ -70,8 +91,6 @@ public abstract class GenericAction<M extends GenericModel> extends ActionSuppor
 		initModel();
 		log.debug(methodName, "Inizializzazione dell'operatore");
 		initOperatore();
-		
-
 	}
 
 	/**
@@ -138,7 +157,13 @@ public abstract class GenericAction<M extends GenericModel> extends ActionSuppor
 		}
 	}
 
-	
+	public Bilancio getBilancio() {
+		return sessionHandler.getBilancio();
+	}
+
+	public Integer getAnnoBilancio() {
+		return Integer.valueOf(getBilancio().getAnno());
+	}
 
 	
 	/**
@@ -175,7 +200,7 @@ public abstract class GenericAction<M extends GenericModel> extends ActionSuppor
 	 * @param response
 	 *            la Response del servizio
 	 */
-	protected void addErrori(ServiceResponse response) {
+	public void addErrori(ServiceResponse response) {
 		model.addErrori(response.getErrori());
 		for (Errore e : response.getErrori()) {
 			addActionError(e.getTesto());
@@ -264,13 +289,21 @@ public abstract class GenericAction<M extends GenericModel> extends ActionSuppor
 		addActionError(errore.getTesto());
 	}
 
+	protected void addErroreDiSistema(String methodName, Exception e) {
+		addErroreDiSistema(methodName, e.getMessage());
+	}
+
+	protected void addErroreDiSistema(String methodName, String text) {
+		addErrore(methodName, ErroreCore.ERRORE_DI_SISTEMA.getErrore(text));
+	}
+
 	/**
 	 * Permette di aggiungere un errore a livello di Model e di Action.
 	 * 
 	 * @param errore
 	 *            l'errore da comunicare
 	 */
-	protected void addErrore(Errore errore) {
+	public void addErrore(Errore errore) {
 		model.addErrore(errore);
 		addActionError(errore.getTesto());
 	}
@@ -473,9 +506,10 @@ public abstract class GenericAction<M extends GenericModel> extends ActionSuppor
 	protected M instantiateNewModel() {
 		final String methodName = "instantiateNewModel";
 		try {
-			Class<M>[] genericTypeArguments = GenericTypeResolver.resolveTypeArguments(
+			// task-xxxxx
+			Class<?>[] genericTypeArguments = GenericTypeResolver.resolveTypeArguments(
 					this.getClass(), GenericAction.class);
-			return genericTypeArguments[0].newInstance();
+			return (M) genericTypeArguments[0].newInstance();
 		} catch (InstantiationException e) {
 			IllegalArgumentException exception = new IllegalArgumentException(
 					"Errore instanziamento automatico del Model. "
@@ -503,7 +537,7 @@ public abstract class GenericAction<M extends GenericModel> extends ActionSuppor
 	 * @param req
 	 *            la request da loggare
 	 */
-	protected void logServiceRequest(ServiceRequest req) {
+	public void logServiceRequest(ServiceRequest req) {
 		log.logXmlTypeObject(req, "Service Request param");
 	}
 
@@ -513,7 +547,7 @@ public abstract class GenericAction<M extends GenericModel> extends ActionSuppor
 	 * @param response
 	 *            la response da loggare
 	 */
-	protected void logServiceResponse(ServiceResponse response) {
+	public void logServiceResponse(ServiceResponse response) {
 		log.logXmlTypeObject(response, "Service Response param");
 	}
 
@@ -538,9 +572,102 @@ public abstract class GenericAction<M extends GenericModel> extends ActionSuppor
 	 * @throws IOException in caso di errore di IO
 	 * @throws ClassNotFoundException in caso di errore di construzione delle classi
 	 */
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-		in.defaultReadObject();
-		this.log = new LogUtil(this.getClass());
+//	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+//		in.defaultReadObject();
+//		this.log = new LogUtil(this.getClass());
+//	}
+
+	
+	/**
+	 * Verifica se l'azione indicata e' presente tra quelle consentite 
+	 * @param nomeAzione
+	 * @return
+	 */
+	protected boolean isAzioneConsentita(AzioneConsentitaEnum azione) {
+		return AzioneConsentitaEnum.isConsentito(azione, sessionHandler.getAzioniConsentite());
 	}
 	
+	protected boolean isAzioneRichiesta(AzioneConsentitaEnum azione) {
+		return azione.getNomeAzione().equals(sessionHandler.getAzioneRichiesta().getAzione().getNome());
+	}
+	
+	public String[] getAzioniTipoFile(String codiceTipoFile) {
+
+		TipoFileHandler tipoFileHandler = getTipoFileHandler(codiceTipoFile);
+
+		return tipoFileHandler == null ? null : tipoFileHandler.getAzioni();
+	}
+
+	protected TipoFileHandler getTipoFileHandler(String codiceTipoFile) {
+		TipoFileIntf tipoFileIntf = getTipoFileIntf(codiceTipoFile);
+
+		if (tipoFileIntf == null) {
+			return null;
+		}
+		
+		if (tipoFileIntf.getHandler() == null) {
+			return null;
+		}
+		
+		return tipoFileIntf.getHandler();
+	}
+
+	protected TipoFileIntf getTipoFileIntf(String codiceTipoFile) {
+		throw new UnsupportedOperationException("Must implement in subclasses");
+	}
+
+	
+	protected String getParametroConfigurazioneEnte(ParametroConfigurazioneEnteEnum parametro, Richiedente richiedente) throws WebServiceInvocationFailureException {
+		GetParametroConfigurazioneEnte getParametroConfigurazioneEnte = new GetParametroConfigurazioneEnte();
+		getParametroConfigurazioneEnte.setNomeParametro(parametro.getNomeParametro());
+		getParametroConfigurazioneEnte.setRichiedente(richiedente);
+		
+		GetParametroConfigurazioneEnteResponse getParametroConfigurazioneEnteResponse = 
+				coreService.getParametroConfigurazioneEnte(getParametroConfigurazioneEnte);
+		
+		checkServiceResponse(GetParametroConfigurazioneEnte.class, getParametroConfigurazioneEnteResponse);
+		
+		
+		return getParametroConfigurazioneEnteResponse.getValoreParametro();
+	}
+
+	protected String getParametroConfigurazioneEnte(ParametroConfigurazioneEnteEnum parametro) {
+		return sessionHandler.getEnte().getParametroConfigurazione(parametro);
+	}
+
+	protected void checkServiceResponse(Class<? extends ServiceRequest> reqClass, ServiceResponse res) throws WebServiceInvocationFailureException {
+		if (res.hasErrori()) {
+			addErrori(res);
+			throw new WebServiceInvocationFailureException(createErrorInServiceInvocationString(reqClass, res));
+		}
+	}
+
+		
+	public String createErrorInServiceInvocationString(Class<? extends ServiceRequest> cls, ServiceResponse res) {
+
+		StringBuilder sb = new StringBuilder()
+			.append("Errore nell'invocazione del servizio ")
+			.append(cls.getSimpleName());
+		if(res != null && res.getErrori() != null) {
+
+			for(Errore errore : res.getErrori()) {
+				sb.append(" - ")
+					.append(errore.getTesto());
+			}
+		}
+
+		return sb.toString();
+	}
+
+	protected void throwSystemExceptionErroreDiSistema(Exception e) {
+		throw new SystemException(ErroreCore.ERRORE_DI_SISTEMA.getErrore(e.getMessage()));
+	}
+	
+	public void initFileDownload(String name, MimeType mimeType, byte[] data)  {
+		initFileDownload(name, mimeType.getMimeType(), data);
+	}
+
+	public void initFileDownload(String name, String mimeType, byte[] data)  {
+		request.put(DownloadFileAction.FILE, new File(name, mimeType, data));
+	}
 }

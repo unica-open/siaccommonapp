@@ -4,7 +4,8 @@
 */
 package it.csi.siac.siaccommonapp.handler.session;
 
-import org.softwareforge.struts2.breadcrumb.BreadCrumbInterceptor;
+//import org.softwareforge.struts2.breadcrumb.BreadCrumbInterceptor;
+import xyz.timedrain.arianna.plugin.BreadCrumbInterceptor;
 
 import it.csi.siac.siaccommonapp.interceptor.AnchorInterceptor;
 

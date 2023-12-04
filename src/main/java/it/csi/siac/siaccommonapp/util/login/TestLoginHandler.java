@@ -9,7 +9,7 @@ import java.util.Map;
 import it.csi.siac.siaccorser.model.Operatore;
 
 
-public class TestLoginHandler extends LoginHandler {
+public class TestLoginHandler implements LoginHandler {
 
 	private static final long serialVersionUID = 6589268336444125090L;
 
@@ -32,8 +32,6 @@ public class TestLoginHandler extends LoginHandler {
 			codiceFiscale = "AAAAAA00A11C000K"; // Demo 22
 			// CMTO
 			//codiceFiscale = "AAAAAA00A11D000L"; // Demo 23
-			//PROD
-			//codiceFiscale = "MSPMRC71T30H355Z"; // Demo 24
 		}
 		Operatore operatore = new Operatore();
 		operatore.setNome("Raffaela");

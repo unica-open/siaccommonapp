@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import it.csi.siac.siaccommonapp.handler.session.CommonSessionParameter;
 import it.csi.siac.siaccommonapp.interceptor.anchor.annotation.AnchorAnnotation;
 import it.csi.siac.siaccommonapp.model.AzioneRichiestaModel;
+import it.csi.siac.siaccommonapp.util.exception.GenericFrontEndMessagesException;
 import it.csi.siac.siaccorser.frontend.webservice.CoreService;
 import it.csi.siac.siaccorser.frontend.webservice.msg.GetAzioneRichiesta;
 import it.csi.siac.siaccorser.frontend.webservice.msg.GetAzioneRichiestaResponse;
@@ -32,9 +33,6 @@ import it.csi.siac.siaccorser.model.ParametroAzioneRichiesta;
 public class AzioneRichiestaAction extends GenericAction<AzioneRichiestaModel> {
 
 	private static final long serialVersionUID = -7152300961767870228L;
-
-	@Autowired
-	private transient CoreService coreService;
 
 	/**
 	 * Instanzia una nuova action a partire dal Model.
@@ -138,6 +136,11 @@ public class AzioneRichiestaAction extends GenericAction<AzioneRichiestaModel> {
 
 		// Invoco il servizio
 		GetAzioneRichiestaResponse response = coreService.getAzioneRichiesta(req);
+		
+		if (response.isFallimento()) {
+			throw new GenericFrontEndMessagesException(response.getDescrizioneErrori());
+		}
+		
 		// Effettua un log della response
 		logServiceResponse(response);
 

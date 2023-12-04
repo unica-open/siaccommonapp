@@ -25,7 +25,7 @@ public class Anchor implements Serializable {
 	private String method;
 	private String name;
 	private String namespace;
-	private Map<String, Object> params;
+	private Map<String, String[]> params;
 	private String useCase;
 	
 	/** Default empty constructor */
@@ -78,14 +78,14 @@ public class Anchor implements Serializable {
 	/**
 	 * @return the params
 	 */
-	public Map<String, Object> getParams() {
+	public Map<String, String[]> getParams() {
 		return params;
 	}
 
 	/**
 	 * @param params the params to set
 	 */
-	public void setParams(Map<String, Object> params) {
+	public void setParams(Map<String, String[]> params) {
 		this.params = params;
 	}
 

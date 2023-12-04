@@ -6,26 +6,25 @@ The original copyright notice and the license, under which CSI-Piemonte received
 are set forth below. You can find the original source code at the link set hereafter.
 Please refer to the accompanying credits file for additional notices.
 
-[Apache 2.0](https://github.com/unica-open/contabilia/blob/master/third-party-licenses/APACHE%202.0-LICENSE.txt) \
-commons-lang3,3.1\
-log4j,1.2.15\
-spring-beans,3.1.1.RELEASE\
-spring-context,3.1.1.RELEASE\
-spring-core,3.1.1.RELEASE\
-spring-web,3.1.1.RELEASE\
-struts2-arianna-plugin,0.5.1\
-struts2-core,2.3.32\
-xwork-core,2.3.32
+[Apache 2.0](../lib/third-party-licenses/APACHE%202.0-LICENSE.txt)\
+commons-lang3,3.8.1\
+spring-aop,4.3.25.RELEASE\
+spring-beans,4.3.26.RELEASE\
+spring-context,4.3.26.RELEASE\
+spring-core,4.3.26.RELEASE\
+spring-web,4.3.26.RELEASE\
+struts2-arianna-plugin,0.7-beta.1\
+struts2-core,2.5.30\
+struts2-spring-plugin,2.5.30
 
-[Common Development and Distribution License (CDDL) 1.0](https://github.com/unica-open/contabilia/blob/master/third-party-licenses/CDDL%201.0-LICENSE.txt) \
+[Common Development and Distribution License (CDDL) 1.0](../lib/third-party-licenses/CDDL%201.0-LICENSE.txt)\
 jboss-servlet-api_3.0_spec,1.0.1.Final-redhat-1
 
-[GNU General Public License 2.0](https://github.com/unica-open/contabilia/blob/master/third-party-licenses/GPL%202.0-LICENSE.txt) \
+[GNU General Public License 2.0](../lib/third-party-licenses/GPL%202.0.txt)\
 jboss-servlet-api_3.0_spec,1.0.1.Final-redhat-1
 
-[GNU Lesser General Public License 2.1](https://github.com/unica-open/contabilia/blob/master/third-party-licenses/LGPL%202.1-LICENSE.txt) \
+[GNU Lesser General Public License 2.1](../lib/third-party-licenses/LGPL%202.1-LICENSE.txt)\
 jboss-jsp-api_2.2_spec,1.0.1.Final-redhat-1
 
-[CSI](https://github.com/unica-open/contabilia/blob/master/Copyrights.txt) \
-csi-stadapter,1.4.6\
-iridev2-pep-intf,2.0.0
+Public Domain\
+aopalliance,1.0.0

@@ -10,13 +10,13 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
-import it.csi.siac.siaccommon.util.log.LogUtil;
+import it.csi.siac.siaccommonapp.util.log.LogWebUtil;
 import it.csi.siac.siaccorser.model.Operatore;
 
-public class TestFileLoginHandler extends LoginHandler {
+public class TestFileLoginHandler implements LoginHandler {
 	private static final long serialVersionUID = 6589268336444125090L;
 
-	protected transient LogUtil log = new LogUtil(this.getClass());
+	protected transient LogWebUtil log = new LogWebUtil(this.getClass());
 
 	/**
 	 * @return the operatore
@@ -43,8 +43,7 @@ public class TestFileLoginHandler extends LoginHandler {
 		InputStream input = null;
 		
 		try {
-			input = new FileInputStream(System.getProperty("file.loginHandler.location", 
-					"D:/eclipse_workspaces/siac/util/testLoginHandler.properties"));
+			input = new FileInputStream(System.getProperty("file.loginHandler.location"));
 			prop.load(input);
 		} finally {
 			if(input != null) {

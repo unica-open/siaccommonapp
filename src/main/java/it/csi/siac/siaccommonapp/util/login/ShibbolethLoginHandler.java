@@ -6,12 +6,12 @@ package it.csi.siac.siaccommonapp.util.login;
 
 import java.util.Map;
 
-import it.csi.iride2.policy.entity.Identita;
+import it.csi.siac.siaccommonapp.util.policy.iride.Identita;
 import it.csi.siac.siaccorser.model.Operatore;
 import it.csi.siac.siaccorser.model.exception.IdentitaDigitaleNonConformeException;
 import it.csi.siac.siaccorser.model.exception.UtenteNonAutenticatoException;
 
-public class ShibbolethLoginHandler extends LoginHandler {
+public class ShibbolethLoginHandler implements LoginHandler {
 
 	private static final long serialVersionUID = -1679660667605240908L;
 

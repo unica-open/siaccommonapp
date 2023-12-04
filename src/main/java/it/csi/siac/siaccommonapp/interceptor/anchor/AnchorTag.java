@@ -73,7 +73,7 @@ public class AnchorTag extends ComponentTagSupport {
 	protected void populateParams() {
 		super.populateParams();
 		IteratorComponent iteratorComponent = (IteratorComponent) getComponent();
-		iteratorComponent.setId(var);
+		iteratorComponent.setVar(var);
 		iteratorComponent.setValue("#session['" + AnchorInterceptor.ANCHOR_STACK_KEY + "'].anchors");
 		iteratorComponent.setStatus(status);
 	}

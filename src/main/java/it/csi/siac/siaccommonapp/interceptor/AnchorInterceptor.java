@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Stack;
 
+import org.apache.struts2.dispatcher.HttpParameters;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import com.opensymphony.xwork2.ActionInvocation;
@@ -149,7 +150,8 @@ public class AnchorInterceptor extends AbstractInterceptor {
 		String method = proxy.getMethod();
 		String name = annotation.name();
 		String namespace = proxy.getNamespace();
-		Map<String, Object> params = invocation.getInvocationContext().getParameters();
+		/*task-91 : Map<String, Object> params = invocation.getInvocationContext().getParameters();*/
+		HttpParameters params = invocation.getInvocationContext().getParameters();
 		String useCase = annotation.value();
 		
 		String temporaryName = annotation.value();
@@ -171,7 +173,7 @@ public class AnchorInterceptor extends AbstractInterceptor {
 		anchor.setMethod(method);
 		anchor.setName(name);
 		anchor.setNamespace(namespace);
-		anchor.setParams(params);
+		anchor.setParams(params.toMap());
 		anchor.setUseCase(useCase);
 		
 		return anchor;
